@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 /*
  * This file is part of Laravel Commentable.
@@ -22,76 +22,75 @@ declare(strict_types=1);
 
 namespace BrianFaust\Commentable;
 
+use Alsofronie\Uuid\UuidModelTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Kalnoy\Nestedset\NodeTrait;
 
-class Comment extends Model
-{
-    use NodeTrait;
+class Comment extends Model {
+	use NodeTrait;
 
-    /**
-     * @var array
-     */
-    protected $guarded = ['id', 'created_at', 'updated_at'];
+	/**
+	 * Use Uuuid 32 as primary key
+	 */
+	use UuidModelTrait;
 
-    /**
-     * @return bool
-     */
-    public function hasChildren(): bool
-    {
-        return $this->children()->count() > 0;
-    }
+	/**
+	 * @var array
+	 */
+	protected $guarded = ['id', 'created_at', 'updated_at'];
 
-    /**
-     * @return mixed
-     */
-    public function commentable(): MorphTo
-    {
-        return $this->morphTo();
-    }
+	/**
+	 * @return bool
+	 */
+	public function hasChildren(): bool {
+		return $this->children()->count() > 0;
+	}
 
-    /**
-     * @return mixed
-     */
-    public function creator(): MorphTo
-    {
-        return $this->morphTo('creator');
-    }
+	/**
+	 * @return mixed
+	 */
+	public function commentable(): MorphTo {
+		return $this->morphTo();
+	}
 
-    /**
-     * @param Model $commentable
-     * @param $data
-     * @param Model $creator
-     *
-     * @return static
-     */
-    public function createComment(Model $commentable, $data, Model $creator): self
-    {
-        return $commentable->comments()->create(array_merge($data, [
-            'creator_id'   => $creator->id,
-            'creator_type' => get_class($creator),
-        ]));
-    }
+	/**
+	 * @return mixed
+	 */
+	public function creator(): MorphTo {
+		return $this->morphTo('creator');
+	}
 
-    /**
-     * @param $id
-     * @param $data
-     *
-     * @return mixed
-     */
-    public function updateComment($id, $data): bool
-    {
-        return (bool) static::find($id)->update($data);
-    }
+	/**
+	 * @param Model $commentable
+	 * @param $data
+	 * @param Model $creator
+	 *
+	 * @return static
+	 */
+	public function createComment(Model $commentable, $data, Model $creator): self {
+		return $commentable->comments()->create(array_merge($data, [
+			'creator_id' => $creator->id,
+			'creator_type' => get_class($creator),
+		]));
+	}
 
-    /**
-     * @param $id
-     *
-     * @return mixed
-     */
-    public function deleteComment($id): bool
-    {
-        return (bool) static::find($id)->delete();
-    }
+	/**
+	 * @param $id
+	 * @param $data
+	 *
+	 * @return mixed
+	 */
+	public function updateComment($id, $data): bool {
+		return (bool) static::find($id)->update($data);
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return mixed
+	 */
+	public function deleteComment($id): bool {
+		return (bool) static::find($id)->delete();
+	}
 }
